@@ -1,0 +1,22 @@
+{
+    "name": "karlsen-technologies/gocardless-php",
+    "description": "PHP package for using the GoCardless API",
+    "autoload": {
+        "psr-4": {
+            "KarlsenTechnologies\\GoCardless\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Thomas Andre Karlsen",
+            "email": "thomas@kartech.no"
+        }
+    ],
+    "require-dev": {
+        "laravel/pint": "^1.13",
+        "phpstan/phpstan": "^1.10"
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}
