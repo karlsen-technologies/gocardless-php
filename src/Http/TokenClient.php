@@ -28,6 +28,21 @@ class TokenClient
         ]);
     }
 
+    public function getClient(): GuzzleClient
+    {
+        return $this->http;
+    }
+
+    public function setClient(GuzzleClient $client): void
+    {
+        $this->http = $client;
+    }
+
+    public function getCredentials(): Credentials
+    {
+        return $this->credentials;
+    }
+
     public function getTokens(): ?Tokens
     {
         return $this->tokens;
@@ -66,9 +81,8 @@ class TokenClient
             );
         }
 
-        // If no access token is set, attempt to refresh it and set it
-        if ($this->tokens->access === null) {
-
+        // If no access token is set, attempt to refresh it  if we have a refresh token and set it
+        if ($this->tokens->access === null && $this->tokens->refresh !== null) {
             try {
                 // If we do not have a refresh token
                 $response = $this->http->post('token/refresh/', [
