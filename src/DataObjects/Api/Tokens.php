@@ -7,10 +7,10 @@ namespace KarlsenTechnologies\GoCardless\DataObjects\Api;
 class Tokens
 {
     public function __construct(
-        public ?string $access = null,
-        public ?int $accessExpiresAt = null,
-        public ?string $refresh = null,
-        public ?int $refreshExpiresAt = null,
+        public ?string $access,
+        public ?int $accessExpiresAt,
+        public string $refresh,
+        public int $refreshExpiresAt,
     ) {
     }
 }
