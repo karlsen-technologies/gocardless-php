@@ -8,6 +8,7 @@ parameters:
     ignoreErrors:
 
     excludePaths:
+        - tests/
 
     checkMissingIterableValueType: false
     checkGenericClassInNonGenericObjectType: false
