@@ -17,6 +17,8 @@
         "phpstan/phpstan": "^1.10"
     },
     "require": {
-        "guzzlehttp/guzzle": "^7.0"
+        "php": "^8.2",
+        "guzzlehttp/guzzle": "^7.0",
+        "spatie/ray": "^1.39"
     }
 }

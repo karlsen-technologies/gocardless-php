@@ -13,4 +13,16 @@ class Bank
         public string $logo,
     ) {
     }
+
+    public static function fromApi(object $response): Bank
+    {
+        return new Bank(
+            $response->id,
+            $response->name,
+            $response->bic,
+            $response->transaction_total_days,
+            $response->countries,
+            $response->logo,
+        );
+    }
 }

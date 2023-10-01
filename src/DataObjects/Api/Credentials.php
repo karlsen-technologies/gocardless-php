@@ -1,8 +1,8 @@
 <?php
 
-namespace KarlsenTechnologies\GoCardless\DataObjects;
+namespace KarlsenTechnologies\GoCardless\DataObjects\Api;
 
-class ApiCredentials
+class Credentials
 {
     public function __construct(
         public string $secretId,
