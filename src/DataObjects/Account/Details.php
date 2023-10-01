@@ -15,7 +15,7 @@ class Details
         public ?string $displayName,
         public string $currency,
         public ?BankStatus $status,
-        public ?string $usage,
+        public ?Usage $usage,
         public ?string $product,
         public ?string $cashAccountType,
         public ?string $iban,

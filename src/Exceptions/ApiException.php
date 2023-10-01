@@ -28,8 +28,6 @@ class ApiException extends Exception
 
     public static function fromApi(object $data): ApiException
     {
-        ray($data);
-
         if (! isset($data->summary) || ! isset($data->detail)) {
             return InputException::fromApi($data);
         }
@@ -37,6 +35,7 @@ class ApiException extends Exception
         return new ApiException(
             $data->summary,
             $data->detail,
+            // @phpstan-ignore-next-line
             $data->status_code
         );
     }

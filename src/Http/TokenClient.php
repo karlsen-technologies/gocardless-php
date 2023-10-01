@@ -51,12 +51,12 @@ class TokenClient
                 ]);
             } catch (BadResponseException $e) {
                 $body = $e->getResponse()->getBody()->getContents();
-                $data = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
+                $data = (object) json_decode($body, false, 512, JSON_THROW_ON_ERROR);
 
                 throw ApiException::fromApi($data);
             }
 
-            $data = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+            $data = (object) json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
 
             $this->tokens = new Tokens(
                 $data->access,
@@ -88,12 +88,12 @@ class TokenClient
                 }
 
                 $body = $e->getResponse()->getBody()->getContents();
-                $data = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
+                $data = (object) json_decode($body, false, 512, JSON_THROW_ON_ERROR);
 
                 throw ApiException::fromApi($data);
             }
 
-            $data = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+            $data = (object) json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
 
             $this->tokens->access = $data->access;
             $this->tokens->accessExpiresAt = $data->access_expires;
@@ -116,14 +116,14 @@ class TokenClient
             $response = $this->http->request($method, $uri, $options);
         } catch (BadResponseException $e) {
             // If we get a 401, and we had an access token, try to refresh it and try again
-            if ($e->getCode() === 401 && $this->tokens->access !== null) {
+            if ($e->getCode() === 401 && $this->tokens?->access !== null) {
                 $this->tokens->access = null;
 
                 return $this->request($method, $uri, $options);
             }
 
             $body = $e->getResponse()->getBody()->getContents();
-            $data = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
+            $data = (object) json_decode($body, false, 512, JSON_THROW_ON_ERROR);
 
             throw ApiException::fromApi($data);
         }
