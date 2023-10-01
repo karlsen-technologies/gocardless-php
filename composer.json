@@ -20,5 +20,9 @@
         "php": "^8.2",
         "guzzlehttp/guzzle": "^7.0",
         "spatie/ray": "^1.39"
+    },
+    "scripts": {
+        "format": "./vendor/bin/pint",
+        "analyze": "phpstan analyse --ansi"
     }
 }
