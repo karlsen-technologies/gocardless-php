@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace KarlsenTechnologies\GoCardless\DataObjects\Account;
 
 use KarlsenTechnologies\GoCardless\Enums\Account\Status;

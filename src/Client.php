@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace KarlsenTechnologies\GoCardless;
 
 use KarlsenTechnologies\GoCardless\DataObjects\Account\Balance;
@@ -15,7 +17,7 @@ use KarlsenTechnologies\GoCardless\Http\TokenClient;
 
 class Client
 {
-    const DEFAULT_API_ENDPOINT = 'https://bankaccountdata.gocardless.com/api/v2/';
+    public const DEFAULT_API_ENDPOINT = 'https://bankaccountdata.gocardless.com/api/v2/';
 
     protected TokenClient $api;
 
@@ -92,7 +94,7 @@ class Client
 
     public function acceptAgreement(string $id, string $userAgent, string $ipAddress): EndUserAgreement
     {
-        $response = $this->api->put("agreements/enduser/$id/accept", [
+        $response = $this->api->put("agreements/enduser/{$id}/accept", [
             'json' => [
                 'user_agent' => $userAgent,
                 'ip_address' => $ipAddress,
@@ -167,7 +169,8 @@ class Client
 
     public function getAccountTransactions(string $id, string $fromDate = null, string $toDate = null): Transactions
     {
-        $response = $this->api->get('accounts/'.$id.'/transactions',
+        $response = $this->api->get(
+            'accounts/'.$id.'/transactions',
             [
                 'query' => [
                     'from_date' => $fromDate,

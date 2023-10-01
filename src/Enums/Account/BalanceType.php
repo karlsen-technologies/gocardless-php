@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace KarlsenTechnologies\GoCardless\Enums\Account;
 
 enum BalanceType: string

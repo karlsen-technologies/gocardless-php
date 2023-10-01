@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace KarlsenTechnologies\GoCardless\Http;
 
 use GuzzleHttp\Client as GuzzleClient;
@@ -39,7 +41,7 @@ class TokenClient
     protected function getAccessToken(): string
     {
         // If no token pair is set, authenticate and set it
-        if ($this->tokens == null) {
+        if ($this->tokens === null) {
             try {
                 $response = $this->http->post('token/new/', [
                     'json' => $this->credentials->toArray(),
@@ -65,7 +67,7 @@ class TokenClient
         }
 
         // If no access token is set, attempt to refresh it and set it
-        if ($this->tokens->access == null) {
+        if ($this->tokens->access === null) {
 
             try {
                 // If we do not have a refresh token
@@ -79,7 +81,7 @@ class TokenClient
                 ]);
             } catch (BadResponseException $e) {
                 // If we get a 401, we need to authenticate fresh
-                if ($e->getCode() == 401) {
+                if ($e->getCode() === 401) {
                     $this->tokens = null;
 
                     return $this->getAccessToken();
@@ -114,7 +116,7 @@ class TokenClient
             $response = $this->http->request($method, $uri, $options);
         } catch (BadResponseException $e) {
             // If we get a 401, and we had an access token, try to refresh it and try again
-            if ($e->getCode() == 401 && $this->tokens->access != null) {
+            if ($e->getCode() === 401 && $this->tokens->access !== null) {
                 $this->tokens->access = null;
 
                 return $this->request($method, $uri, $options);

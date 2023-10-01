@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace KarlsenTechnologies\GoCardless\Exceptions;
 
-class ApiException extends \Exception
+use Exception;
+
+class ApiException extends Exception
 {
     public function __construct(
         protected string $summary,
