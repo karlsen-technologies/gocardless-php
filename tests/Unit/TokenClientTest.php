@@ -173,7 +173,8 @@ it('can refresh an expired access token', function (): void {
 
     $guzzle->shouldReceive('request')->once()
         ->with('GET', 'test/', Mockery::any())
-        ->andThrow(new GuzzleClientException(
+        ->andThrow(
+            new GuzzleClientException(
                 'Unauthorized',
                 new GuzzleRequest('GET', 'test/'),
                 new GuzzleResponse(401, [], '{ "summary": "Authentication failed", "detail": "Invalid access token", "status_code": 401 }'),
@@ -218,7 +219,8 @@ it('can get new tokens when both are invalid', function (): void {
 
     $guzzle->shouldReceive('request')->once()
         ->with('GET', 'test/', Mockery::any())
-        ->andThrow(new GuzzleClientException(
+        ->andThrow(
+            new GuzzleClientException(
                 'Unauthorized',
                 new GuzzleRequest('GET', 'test/'),
                 new GuzzleResponse(401, [], '{ "summary": "Authentication failed", "detail": "Invalid access token", "status_code": 401 }'),
@@ -227,7 +229,8 @@ it('can get new tokens when both are invalid', function (): void {
 
     $guzzle->shouldReceive('post')->once()
         ->with('token/refresh/', Mockery::any())
-        ->andThrow(new GuzzleClientException(
+        ->andThrow(
+            new GuzzleClientException(
                 'Invalid refresh token',
                 new GuzzleRequest('GET', 'test/'),
                 new GuzzleResponse(401, [], '{ "summary": "Invalid refresh token", "detail": "Invalid refresh token", "status_code": 401 }'),
@@ -268,7 +271,8 @@ it('throws an exception while getting tokens', function (): void {
     $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
     $guzzle->shouldReceive('post')->once()
         ->with('token/new/', Mockery::any())
-        ->andThrow(new GuzzleClientException(
+        ->andThrow(
+            new GuzzleClientException(
                 'I\'m a teapot',
                 new GuzzleRequest('post', 'token/new/'),
                 new GuzzleResponse(418, [], '{ "summary": "I\'m a teapot", "detail": "I\'m a teapot", "status_code": 418 }'),
@@ -289,7 +293,8 @@ it('throws an exception while refreshing access token', function (): void {
     $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
     $guzzle->shouldReceive('post')->once()
         ->with('token/refresh/', Mockery::any())
-        ->andThrow(new GuzzleClientException(
+        ->andThrow(
+            new GuzzleClientException(
                 'Missing parameters',
                 new GuzzleRequest('post', 'token/refresh/'),
                 new GuzzleResponse(400, [], '{ "refresh": ["Field is required"], "status_code": 400 }'),
@@ -311,7 +316,8 @@ it('throws an exception while performing a request', function (): void {
     $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
     $guzzle->shouldReceive('request')->once()
         ->with('GET', 'test/', Mockery::any())
-        ->andThrow(new GuzzleClientException(
+        ->andThrow(
+            new GuzzleClientException(
                 'Server unavailable.',
                 new GuzzleRequest('post', 'test/'),
                 new GuzzleResponse(500, [], '{ "summary": "Server unavailable.", "details": "The server is unavailable.", "status_code": 500 }'),
