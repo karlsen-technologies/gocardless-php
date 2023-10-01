@@ -26,6 +26,16 @@ class Client
         $this->api = new TokenClient($credentials, $endpoint);
     }
 
+    public function setApiClient(TokenClient $client): void
+    {
+        $this->api = $client;
+    }
+
+    public function getApiClient(): TokenClient
+    {
+        return $this->api;
+    }
+
     public function setTokens(Tokens $tokens): void
     {
         $this->api->setTokens($tokens);
