@@ -1,6 +1,7 @@
 {
     "name": "karlsen-technologies/gocardless-php",
-    "description": "PHP package for using the GoCardless API",
+    "description": "Unofficial PHP package for using the GoCardless API",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "KarlsenTechnologies\\GoCardless\\": "src/"
