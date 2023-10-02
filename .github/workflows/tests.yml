@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   tests:
@@ -19,16 +19,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Get Composer cache directory path
-        id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache composer
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: dependencies-php-8.2-composer-${{ hashFiles('composer.json') }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -45,4 +35,4 @@ jobs:
           command: composer install --prefer-dist --optimize-autoloader --no-interaction --no-progress
 
       - name: Run tests
-        run: vendor/bin/pest --compact
+        run: composer test
