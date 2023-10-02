@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use KarlsenTechnologies\GoCardless\Exceptions\InputException;
 
-it('can get the summary', function () {
+it('can get the summary', function (): void {
     $exception = new InputException([
         "amount" => [
             "Must be a positive integer."
@@ -12,7 +14,7 @@ it('can get the summary', function () {
     expect($exception->getSummary())->toBe('Input is missing or malformed.');
 });
 
-it('can get the details', function () {
+it('can get the details', function (): void {
     $exception = new InputException([
         "amount" => [
             "Must be a positive integer."
@@ -22,7 +24,7 @@ it('can get the details', function () {
     expect($exception->getDetails())->toBe('amount: Must be a positive integer. ');
 });
 
-it('can get the fields', function () {
+it('can get the fields', function (): void {
     $exception = new InputException([
         "amount" => [
             "Must be a positive integer."
@@ -36,7 +38,7 @@ it('can get the fields', function () {
     ]);
 });
 
-it('can be created from an api response', function () {
+it('can be created from an api response', function (): void {
     $data = (object) [
         'amount' => [
             'Must be a positive integer.',
