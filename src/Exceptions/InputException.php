@@ -12,13 +12,13 @@ class InputException extends ApiException
     {
         $this->fields = $fields;
 
-        $summary = '';
+        $details = '';
 
         foreach ($fields as $field => $errors) {
-            $summary .= $field.': '.implode(', ', (array) $errors).' ';
+            $details .= $field.': '.implode(', ', (array) $errors).' ';
         }
 
-        parent::__construct('Input is missing or malformed.', $summary, $code);
+        parent::__construct('Input is missing or malformed.', $details, $code);
     }
 
     public function getFields(): array
