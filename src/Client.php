@@ -10,7 +10,7 @@ use KarlsenTechnologies\GoCardless\DataObjects\Account\Metadata;
 use KarlsenTechnologies\GoCardless\DataObjects\Account\Transactions;
 use KarlsenTechnologies\GoCardless\DataObjects\Api\Credentials;
 use KarlsenTechnologies\GoCardless\DataObjects\Api\Tokens;
-use KarlsenTechnologies\GoCardless\DataObjects\Bank;
+use KarlsenTechnologies\GoCardless\DataObjects\Institution;
 use KarlsenTechnologies\GoCardless\DataObjects\EndUserAgreement;
 use KarlsenTechnologies\GoCardless\DataObjects\Requisition;
 use KarlsenTechnologies\GoCardless\Http\TokenClient;
@@ -46,7 +46,7 @@ class Client
         return $this->api->getTokens();
     }
 
-    public function getBanks(string $country = null): array
+    public function getInstitutions(string $country = null): array
     {
         $response = $this->api->get('institutions', [
             'query' => $country ? [
@@ -54,14 +54,14 @@ class Client
             ] : [],
         ]);
 
-        return array_map(fn ($bank) => Bank::fromApi($bank), $response->data);
+        return array_map(fn ($institution) => Institution::fromApi($institution), $response->data);
     }
 
-    public function getBank(string $id): Bank
+    public function getInstitution(string $id): Institution
     {
         $response = $this->api->get('institutions/'.$id);
 
-        return Bank::fromApi($response->data);
+        return Institution::fromApi($response->data);
     }
 
     public function getAgreements(int $limit = 100, int $offset = 0): array

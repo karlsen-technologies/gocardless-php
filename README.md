@@ -38,9 +38,9 @@ use KarlsenTechnologies\GoCardless\Client;
 
 $client = new Client(...);
 
-$client->getBanks();
-$client->getBanks('COUNTRY');
-$client->getBank('INSTITUTION_ID');
+$client->getInstitutions();
+$client->getInstitutions('COUNTRY');
+$client->getInstitution('INSTITUTION_ID');
 
 $client->getAgreements(); // Default limit of 100, offset of 0
 $client->getAgreements(100, 10);  // Limit of 100, offset of 10

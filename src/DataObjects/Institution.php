@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace KarlsenTechnologies\GoCardless\DataObjects;
 
-class Bank
+class Institution
 {
     public function __construct(
         public string $id,
@@ -16,9 +16,9 @@ class Bank
     ) {
     }
 
-    public static function fromApi(object $response): Bank
+    public static function fromApi(object $response): Institution
     {
-        return new Bank(
+        return new Institution(
             $response->id,
             $response->name,
             $response->bic,

@@ -9,7 +9,7 @@ use KarlsenTechnologies\GoCardless\DataObjects\Account\Balance;
 use KarlsenTechnologies\GoCardless\DataObjects\Account\Details;
 use KarlsenTechnologies\GoCardless\DataObjects\Api\Credentials;
 use KarlsenTechnologies\GoCardless\DataObjects\Api\Tokens;
-use KarlsenTechnologies\GoCardless\DataObjects\Bank;
+use KarlsenTechnologies\GoCardless\DataObjects\Institution;
 use KarlsenTechnologies\GoCardless\DataObjects\EndUserAgreement;
 use KarlsenTechnologies\GoCardless\DataObjects\Requisition;
 use KarlsenTechnologies\GoCardless\DataObjects\Transaction;
@@ -55,7 +55,7 @@ it('can set and get the authentication tokens of the TokenClient', function (): 
         ->and($this->client->getTokens())->toBe($tokens);
 });
 
-it('can get a list of banks', function (): void {
+it('can get a list of institutions', function (): void {
     $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'institutions/', [
             'query' => [],
@@ -64,16 +64,18 @@ it('can get a list of banks', function (): void {
                 'Accept' => 'application/json',
             ]
         ])
-        ->andReturn(new GuzzleResponse(200, [], '[{"id": "bank_123", "name": "Bank of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}]'));
+        ->andReturn(new GuzzleResponse(200, [], '[{"id": "bank_123", "name": "Institution of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}]'));
 
-    $banks = $this->client->getBanks();
+    $institutions = $this->client->getInstitutions();
 
-    expect($banks)->toBeArray()
-        ->and($banks)->toHaveCount(1)
-        ->and($banks[0])->toBeInstanceOf(Bank::class)
-        ->and($banks[0])->toMatchObject([
+    expect($institutions)
+        ->toBeArray()
+        ->toHaveCount(1)
+        ->and($institutions[0])
+        ->toBeInstanceOf(Institution::class)
+        ->toMatchObject([
             'id' => 'bank_123',
-            'name' => 'Bank of Test',
+            'name' => 'Institution of Test',
             'bic' => 'TESTBIC',
             'transactionTotalDays' => 5,
             'countries' => ['GB'],
@@ -81,7 +83,7 @@ it('can get a list of banks', function (): void {
         ]);
 });
 
-it('can get a list of banks limited by country', function (): void {
+it('can get a list of institutions limited by country', function (): void {
     $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'institutions/', [
             'query' => [
@@ -92,16 +94,18 @@ it('can get a list of banks limited by country', function (): void {
                 'Accept' => 'application/json',
             ]
         ])
-        ->andReturn(new GuzzleResponse(200, [], '[{"id": "bank_123", "name": "Bank of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}]'));
+        ->andReturn(new GuzzleResponse(200, [], '[{"id": "bank_123", "name": "Institution of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}]'));
 
-    $banks = $this->client->getBanks('GB');
+    $institutions = $this->client->getInstitutions('GB');
 
-    expect($banks)->toBeArray()
-        ->and($banks)->toHaveCount(1)
-        ->and($banks[0])->toBeInstanceOf(Bank::class)
-        ->and($banks[0])->toMatchObject([
+    expect($institutions)
+        ->toBeArray()
+        ->toHaveCount(1)
+        ->and($institutions[0])
+        ->toBeInstanceOf(Institution::class)
+        ->toMatchObject([
             'id' => 'bank_123',
-            'name' => 'Bank of Test',
+            'name' => 'Institution of Test',
             'bic' => 'TESTBIC',
             'transactionTotalDays' => 5,
             'countries' => ['GB'],
@@ -109,22 +113,22 @@ it('can get a list of banks limited by country', function (): void {
         ]);
 });
 
-it('can get a bank', function (): void {
+it('can get a institution', function (): void {
     $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'institutions/bank123/', Mockery::any())
         ->andReturn(new GuzzleResponse(
             200,
             [],
-            '{"id": "bank_123", "name": "Bank of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}'
+            '{"id": "bank_123", "name": "Institution of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}'
         ));
 
-    $banks = $this->client->getBank('bank123');
+    $institution = $this->client->getInstitution('bank123');
 
-    expect($banks)
-        ->toBeInstanceOf(Bank::class)
+    expect($institution)
+        ->toBeInstanceOf(Institution::class)
         ->toMatchObject([
             'id' => 'bank_123',
-            'name' => 'Bank of Test',
+            'name' => 'Institution of Test',
             'bic' => 'TESTBIC',
             'transactionTotalDays' => 5,
             'countries' => ['GB'],
