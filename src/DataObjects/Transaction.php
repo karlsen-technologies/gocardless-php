@@ -7,34 +7,6 @@ namespace KarlsenTechnologies\GoCardless\DataObjects;
 use KarlsenTechnologies\GoCardless\DataObjects\Account\Amount;
 use KarlsenTechnologies\GoCardless\DataObjects\Account\Balance;
 
-/**
- * {#826
- * +"transactionId": "2023093001723008-1",
- * +"bookingDate": "2023-09-30",
- * +"valueDate": "2023-09-30",
- * +"transactionAmount": {#856
- * +"amount": "-15.00",
- * +"currency": "EUR",
- * },
- * +"remittanceInformationUnstructured": "PAYMENT Alderaan Coffe",
- * +"bankTransactionCode": "PMNT",
- * },
- * {#832
- * +"transactionId": "2023093001723007-1",
- * +"bookingDate": "2023-09-30",
- * +"valueDate": "2023-09-30",
- * +"transactionAmount": {#822
- * +"amount": "45.00",
- * +"currency": "EUR",
- * },
- * +"debtorName": "MON MOTHMA",
- * +"debtorAccount": {#818
- * +"iban": "GL0610500000010500",
- * },
- * +"remittanceInformationUnstructured": "For the support of Restoration of the Republic foundation",
- * +"bankTransactionCode": "PMNT",
- * },
- */
 class Transaction
 {
     public function __construct(
