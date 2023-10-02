@@ -44,4 +44,4 @@ jobs:
           command: composer install --prefer-dist --optimize-autoloader --no-interaction --no-progress
 
       - name: Execute the tests
-        run: vendor/bin/pest --parallel --compact
+        run: vendor/bin/pest --compact
