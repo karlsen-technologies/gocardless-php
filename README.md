@@ -1,20 +1,14 @@
 # Unofficial GoCardless PHP Library
 
------------------------------------
-
 This is an unofficial PHP library for the [GoCardless Bank Account Data API](https://gocardless.com/bank-account-data/).
 
 It provides the same endpoints and uses the same arguments as the official api, see a full list of endpoints [here](https://developer.gocardless.com/bank-account-data/endpoints).
 
 ## Requirements
 
------------------------------------
-
 - **PHP:** 8.2 or above
 
 ## Installation
-
------------------------------------
 
 You can install the library using composer:
 ```bash
@@ -22,8 +16,6 @@ composer require karlsen-technologies/gocardless-php
 ```
 
 ## Usage
-
------------------------------------
 
 In order to use this library you first need to setup an application and get your credentials from the [GoCardless Dashboard](https://bankaccountdata.gocardless.com/).
 
@@ -90,15 +82,11 @@ $client->setTokens($newTokens);
 
 ## Testing
 
------------------------------------
-
 Run the tests using:
 ```bash
 composer test
 ```
 
 ## License
-
------------------------------------
 
 This library is licensed under the [MIT License](LICENSE.md).
