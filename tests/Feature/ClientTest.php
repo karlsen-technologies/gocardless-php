@@ -21,46 +21,42 @@ use KarlsenTechnologies\GoCardless\Http\TokenClient;
 use KarlsenTechnologies\GoCardless\DataObjects\Account\Metadata;
 use KarlsenTechnologies\GoCardless\Enums\Account\Status as AccountStatus;
 
+beforeEach(function (): void {
+    $this->credentials = new Credentials('valid', 'credentials');
+    $this->tokens = new Tokens('access', 10, 'refresh', 42);
+
+    $this->tokenClient = new TokenClient($this->credentials, 'https://example.com');
+    $this->client = new Client($this->credentials, 'https://example.com');
+    $this->guzzle = Mockery::mock(\GuzzleHttp\Client::class);
+
+    $this->tokenClient->setClient($this->guzzle);
+    $this->tokenClient->setTokens($this->tokens);
+    $this->client->setApiClient($this->tokenClient);
+});
+
 it('can set and get the api client', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
+    $tokenClient = new TokenClient($this->credentials, 'https://test.com');
 
-    $client = new Client($credentials, 'https://example.com');
+    $this->client->setApiClient($tokenClient);
 
-    $client->setApiClient($tokenClient);
-
-    expect($client->getApiClient())->toBe($tokenClient);
+    expect($this->client->getApiClient())->toBe($tokenClient);
 });
 
 it('can pass the credentials to the api client', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-
-    $client = new Client($credentials, 'https://example.com');
-
-    expect($client->getApiClient()->getCredentials())->toBe($credentials);
+    expect($this->client->getApiClient()->getCredentials())->toBe($this->credentials);
 });
 
 it('can set and get the authentication tokens of the TokenClient', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
+    $tokens = new Tokens('fresh', 10, 'tokens', 42);
 
-    $client = new Client($credentials, 'https://example.com');
+    $this->client->setTokens($tokens);
 
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    expect($tokenClient->getTokens())->toBe($tokens)
-        ->and($client->getTokens())->toBe($tokens);
+    expect($this->tokenClient->getTokens())->toBe($tokens)
+        ->and($this->client->getTokens())->toBe($tokens);
 });
 
 it('can get a list of banks', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'institutions/', [
             'query' => [],
             'headers' => [
@@ -70,14 +66,7 @@ it('can get a list of banks', function (): void {
         ])
         ->andReturn(new GuzzleResponse(200, [], '[{"id": "bank_123", "name": "Bank of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}]'));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $banks = $client->getBanks();
+    $banks = $this->client->getBanks();
 
     expect($banks)->toBeArray()
         ->and($banks)->toHaveCount(1)
@@ -93,12 +82,7 @@ it('can get a list of banks', function (): void {
 });
 
 it('can get a list of banks limited by country', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'institutions/', [
             'query' => [
                 "country" => "GB",
@@ -110,14 +94,7 @@ it('can get a list of banks limited by country', function (): void {
         ])
         ->andReturn(new GuzzleResponse(200, [], '[{"id": "bank_123", "name": "Bank of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}]'));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $banks = $client->getBanks('GB');
+    $banks = $this->client->getBanks('GB');
 
     expect($banks)->toBeArray()
         ->and($banks)->toHaveCount(1)
@@ -133,12 +110,7 @@ it('can get a list of banks limited by country', function (): void {
 });
 
 it('can get a bank', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'institutions/bank123/', Mockery::any())
         ->andReturn(new GuzzleResponse(
             200,
@@ -146,14 +118,7 @@ it('can get a bank', function (): void {
             '{"id": "bank_123", "name": "Bank of Test", "bic": "TESTBIC", "transaction_total_days": 5, "countries": ["GB"], "logo": "https://gocardless.com/logo.png"}'
         ));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $banks = $client->getBank('bank123');
+    $banks = $this->client->getBank('bank123');
 
     expect($banks)
         ->toBeInstanceOf(Bank::class)
@@ -168,12 +133,7 @@ it('can get a bank', function (): void {
 });
 
 it('can get a list of agreements', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'agreements/enduser/', [
             'query' => [
                 'limit' => 10,
@@ -190,14 +150,7 @@ it('can get a list of agreements', function (): void {
             '{"results": [{"id": "agreement_123", "created": "2023-06-07 12:23:00", "institution_id": "inst_123", "max_historical_days": 90, "access_valid_for_days": 90, "access_scope": ["scope_1", "scope_2"], "accepted": "2023-06-08 13:42:00"}]}'
         ));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $agreements = $client->getAgreements(10, 4);
+    $agreements = $this->client->getAgreements(10, 4);
 
     expect($agreements)->toBeArray()
         ->and($agreements)->toHaveCount(1)
@@ -214,12 +167,7 @@ it('can get a list of agreements', function (): void {
 });
 
 it('can get an agreement', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'agreements/enduser/agre123/', Mockery::any())
         ->andReturn(new GuzzleResponse(
             200,
@@ -227,14 +175,7 @@ it('can get an agreement', function (): void {
             '{"id": "agreement_123", "created": "2023-06-07 12:23:00", "institution_id": "inst_123", "max_historical_days": 90, "access_valid_for_days": 90, "access_scope": ["scope_1", "scope_2"], "accepted": "2023-06-08 13:42:00"}'
         ));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $agreements = $client->getAgreement('agre123');
+    $agreements = $this->client->getAgreement('agre123');
 
     expect($agreements)->toBeInstanceOf(EndUserAgreement::class)
         ->and($agreements)->toMatchObject([
@@ -249,12 +190,7 @@ it('can get an agreement', function (): void {
 });
 
 it('can create an agreement', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('POST', 'agreements/enduser/', [
             'json' => [
                 'institution_id' => 'inst_123',
@@ -275,14 +211,7 @@ it('can create an agreement', function (): void {
             '{"id": "agreement_456", "created": "2023-06-07 12:23:00", "institution_id": "inst_123", "max_historical_days": 30, "access_valid_for_days": 40, "access_scope": ["test"], "accepted": "2023-06-08 13:42:00"}'
         ));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $agreements = $client->createAgreement('inst_123', 30, 40, ['test']);
+    $agreements = $this->client->createAgreement('inst_123', 30, 40, ['test']);
 
     expect($agreements)->toBeInstanceOf(EndUserAgreement::class)
         ->and($agreements)->toMatchObject([
@@ -297,32 +226,15 @@ it('can create an agreement', function (): void {
 });
 
 it('can delete an agreement', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('DELETE', 'agreements/enduser/agre123/', Mockery::any())
         ->andReturn(new GuzzleResponse(200, [], '{}'));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    expect(fn () => $client->deleteAgreement('agre123'))->not()->toThrow(Exception::class);
+    expect(fn () => $this->client->deleteAgreement('agre123'))->not()->toThrow(Exception::class);
 });
 
 it('can accept an agreement', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('PUT', 'agreements/enduser/agreement_123/accept/', [
             'json' => [
                 'user_agent' => 'gocardless-php',
@@ -339,14 +251,7 @@ it('can accept an agreement', function (): void {
             '{"id": "agreement_123", "created": "2023-06-07 12:23:00", "institution_id": "inst_123", "max_historical_days": 90, "access_valid_for_days": 90, "access_scope": ["test"], "accepted": "2023-06-08 13:42:00"}'
         ));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $agreement = $client->acceptAgreement('agreement_123', 'gocardless-php', '127.0.0.1');
+    $agreement = $this->client->acceptAgreement('agreement_123', 'gocardless-php', '127.0.0.1');
 
     expect($agreement)->toBeInstanceOf(EndUserAgreement::class)
         ->and($agreement)->toMatchObject([
@@ -361,10 +266,6 @@ it('can accept an agreement', function (): void {
 });
 
 it('can get a list of requisitions', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
     $requisitionData = (object) [
         "id" => "requisition_123",
         "created" => "2023-06-07 12:23:00",
@@ -385,8 +286,7 @@ it('can get a list of requisitions', function (): void {
         "redirect_immediate" => false,
     ];
 
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'requisitions/', [
             'query' => [
                 'limit' => 10,
@@ -399,14 +299,7 @@ it('can get a list of requisitions', function (): void {
         ])
         ->andReturn(new GuzzleResponse(200, [], '{"results": [' . json_encode($requisitionData) . ']}'));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $requisitions = $client->getRequisitions(10, 2);
+    $requisitions = $this->client->getRequisitions(10, 2);
 
     expect($requisitions)->toBeArray()
         ->and($requisitions)->toHaveCount(1)
@@ -429,10 +322,6 @@ it('can get a list of requisitions', function (): void {
 });
 
 it('can get a requisition', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
     $requisitionData = (object) [
         "id" => "requisition_123",
         "created" => "2023-06-07 12:23:00",
@@ -453,19 +342,11 @@ it('can get a requisition', function (): void {
         "redirect_immediate" => false,
     ];
 
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'requisitions/req123/', Mockery::any())
         ->andReturn(new GuzzleResponse(200, [], json_encode($requisitionData)));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $requisition = $client->getRequisition('req123');
+    $requisition = $this->client->getRequisition('req123');
 
     expect($requisition)
         ->toBeInstanceOf(Requisition::class)
@@ -487,10 +368,6 @@ it('can get a requisition', function (): void {
 });
 
 it('can create a requisition', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
     $requisitionData = (object) [
         "id" => "requisition_123",
         "created" => "2023-06-07 12:23:00",
@@ -511,8 +388,7 @@ it('can create a requisition', function (): void {
         "redirect_immediate" => true,
     ];
 
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('POST', 'requisitions/', [
             'json' => [
                 'redirect' => 'http://localhost',
@@ -531,14 +407,7 @@ it('can create a requisition', function (): void {
         ])
         ->andReturn(new GuzzleResponse(200, [], json_encode($requisitionData)));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $requisition = $client->createRequisition('http://localhost', 'inst_123', 'agreement_123', 'ref_123', 'EN', '123456789', false, true);
+    $requisition = $this->client->createRequisition('http://localhost', 'inst_123', 'agreement_123', 'ref_123', 'EN', '123456789', false, true);
 
     expect($requisition)
         ->toBeInstanceOf(Requisition::class)
@@ -560,30 +429,14 @@ it('can create a requisition', function (): void {
 });
 
 it('can delete a requisition', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('DELETE', 'requisitions/req123/', Mockery::any())
         ->andReturn(new GuzzleResponse(200, [], '{}'));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    expect(fn () => $client->deleteRequisition('req123'))->not()->toThrow(Exception::class);
+    expect(fn () => $this->client->deleteRequisition('req123'))->not()->toThrow(Exception::class);
 });
 
 it('can get an account', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
     $accountData = (object) [
         "id" => "account_123",
         "created" => "2023-06-07 12:23:00",
@@ -594,19 +447,11 @@ it('can get an account', function (): void {
         "owner_name" => "Owner Name",
     ];
 
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'accounts/account_123/', Mockery::any())
         ->andReturn(new GuzzleResponse(200, [], json_encode($accountData)));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $account = $client->getAccount('account_123');
+    $account = $this->client->getAccount('account_123');
 
     expect($account)
         ->toBeInstanceOf(Metadata::class)
@@ -622,10 +467,6 @@ it('can get an account', function (): void {
 });
 
 it('can get an accounts balances', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
     $balanceData = (object) [
         "balanceAmount" => (object) [
             "amount" => 12.34,
@@ -638,19 +479,11 @@ it('can get an accounts balances', function (): void {
         "referenceDate" => "2023-06-09 14:23:00",
     ];
 
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'accounts/account_123/balances/', Mockery::any())
         ->andReturn(new GuzzleResponse(200, [], '{"balances": [' . json_encode($balanceData) . ']}'));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $balances = $client->getAccountBalances('account_123');
+    $balances = $this->client->getAccountBalances('account_123');
 
     expect($balances)->toBeArray()
         ->toHaveCount(1)
@@ -668,10 +501,6 @@ it('can get an accounts balances', function (): void {
 });
 
 it('can get an accounts details', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
     $detailsData = (object) [
         "resourceId" => "account_123",
         "name" => "my_account",
@@ -691,19 +520,11 @@ it('can get an accounts details', function (): void {
         'ownerAddressUnstructured' => 'Owner Address',
     ];
 
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'accounts/account_123/details/', Mockery::any())
         ->andReturn(new GuzzleResponse(200, [], '{"account": ' . json_encode($detailsData) . '}'));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $details = $client->getAccountDetails('account_123');
+    $details = $this->client->getAccountDetails('account_123');
 
     expect($details)
         ->toBeInstanceOf(Details::class)
@@ -730,10 +551,6 @@ it('can get an accounts details', function (): void {
 });
 
 it('can get an accounts transactions', function (): void {
-    $credentials = new Credentials('valid', 'credentials');
-    $tokenClient = new TokenClient($credentials, 'https://example.com');
-    $tokens = new Tokens('access', 10, 'refresh', 42);
-
     $transactionData = (object) [
         "additionalInformation" => "Additional Information",
         "additionalInformationStructured" => "Additional Information Structured",
@@ -792,8 +609,7 @@ it('can get an accounts transactions', function (): void {
         'valueDateTime' => '2023-06-08 12:23:00',
     ];
 
-    $guzzle = Mockery::mock(\GuzzleHttp\Client::class);
-    $guzzle->shouldReceive('request')->once()
+    $this->guzzle->shouldReceive('request')->once()
         ->with('GET', 'accounts/account_123/transactions/', [
             'query' => [
                 'from_date' => '2023-06-08',
@@ -806,14 +622,7 @@ it('can get an accounts transactions', function (): void {
         ])
         ->andReturn(new GuzzleResponse(200, [], '{"transactions": {"booked": [' . json_encode($transactionData) . '], "pending": [' . json_encode($transactionData) . ']}}'));
 
-    $tokenClient->setClient($guzzle);
-
-    $client = new Client($credentials, 'https://example.com');
-
-    $client->setApiClient($tokenClient);
-    $client->setTokens($tokens);
-
-    $transactions = $client->getAccountTransactions('account_123', '2023-06-08', '2023-06-09');
+    $transactions = $this->client->getAccountTransactions('account_123', '2023-06-08', '2023-06-09');
 
     expect($transactions->booked)
         ->toBeArray()
@@ -927,5 +736,4 @@ it('can get an accounts transactions', function (): void {
             'valueDate' => '2023-06-08',
             'valueDateTime' => '2023-06-08 12:23:00',
         ]);
-
 });
